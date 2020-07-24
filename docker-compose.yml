@@ -1,16 +1,25 @@
 version: "3.3"
 services:
   database:
-    build: database
+    build: database/docker
     environment:
-      - MYSQL_DATABASE=${DATABASE_NAME}
-      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD}
-  app:
-    build: app
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      TZ: "Asia/Tokyo"
+  dev:
+    build: dev/docker
     environment:
       - DB_PASSWORD=${DATABASE_PASSWORD}
-    ports:
-      - 8888:8000
     tty: true
     volumes:
-      - ./app/app:/app
+      - ./dev/app:/var/www
+  nginx:
+    build: nginx/docker
+    ports:
+      - 80:80
+    volumes:
+      - ./dev/app:/var/www
+  php:
+    build: php/docker
+    volumes:
+      - ./dev/app:/var/www
